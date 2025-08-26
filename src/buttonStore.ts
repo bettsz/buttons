@@ -73,21 +73,48 @@ export const getButtonById = async (
   id: string
 ): Promise<Arguments> => {
   const store = getStore(app.isMobile);
-  const storedButton = store.filter(
-    (item: ExtendedBlockCache) => `button-${id}` === item.id
-  )[0];
-  if (storedButton) {
-    const file = app.vault.getAbstractFileByPath(storedButton.path);
+
+  // Helper: read a button's raw args by its block id (without inheritance)
+  const readArgsByBlockId = async (blockId: string): Promise<Arguments | undefined> => {
+    const btn = (store || []).find(
+      (item: ExtendedBlockCache) => `button-${blockId}` === item.id
+    );
+    if (!btn) return undefined;
+    const file = app.vault.getAbstractFileByPath(btn.path);
     const content = await app.vault.cachedRead(file as TFile);
     const contentArray = content.split("\n");
     const button = contentArray
-      .slice(
-        storedButton.position.start.line + 1,
-        storedButton.position.end.line
-      )
+      .slice(btn.position.start.line + 1, btn.position.end.line)
       .join("\n");
     return createArgumentObject(button);
-  }
+  };
+
+  // Resolve inheritance chain with loop/depth protection
+  const resolveInheritedArgs = async (
+    startId: string,
+    visited: Set<string> = new Set(),
+    depth = 0
+  ): Promise<Arguments | undefined> => {
+    if (depth > 3) return undefined; // prevent deep/recursive chains
+    if (visited.has(startId)) return undefined; // prevent cycles
+    visited.add(startId);
+
+    const childArgs = await readArgsByBlockId(startId);
+    if (!childArgs) return undefined;
+
+    const parentId = typeof childArgs.id === "string" ? childArgs.id.trim() : "";
+    if (!parentId) return childArgs;
+
+    // Recursively resolve parent's args first
+    const parentArgs = await resolveInheritedArgs(parentId, visited, depth + 1);
+    if (!parentArgs) return childArgs; // missing/loop => fallback to child-only
+
+    // Merge: parent first, then child to give child precedence
+    return { ...parentArgs, ...childArgs };
+  };
+
+  const merged = await resolveInheritedArgs(id);
+  if (merged) return merged;
 };
 
 export const getButtonSwapById = async (
