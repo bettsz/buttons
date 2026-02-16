@@ -9,6 +9,7 @@ import { template } from "./template";
 import { calculate } from "./calculate";
 import { text } from "./text";
 import templater from "../templater";
+import { variable } from "./variable";
 
 export const chain = async (
   app: App,
@@ -94,6 +95,8 @@ export const chain = async (
       } else if (actionArgs.type === "chain") {
         // Support nested chains
         await chain(app, actionArgs, currentPosition, inline, id, file);
+      } else if (actionArgs.type === "variable") {
+        await variable(app, actionArgs, currentPosition);
       } else {
         new Notice(`Unsupported action type in chain: ${actionArgs.type}`);
       }

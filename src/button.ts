@@ -10,7 +10,8 @@ import {
   swap,
   template,
   text,
-  chain, // <-- Add chain import
+  chain,
+  variable,
 } from "./buttonTypes";
 import { getButtonPosition, getInlineButtonPosition, getBlockButtonPositionById } from "./parser";
 import templater from "./templater";
@@ -213,5 +214,9 @@ const clickHandler = async (
   if (processedArgs.type === "chain") {
     await chain(app, processedArgs, position, inline, id, activeFile);
     return;
+  }
+  // handle variable buttons
+  if (processedArgs.type === "variable") {
+    await variable(app, processedArgs, position);
   }
 };

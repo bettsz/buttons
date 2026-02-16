@@ -8,4 +8,5 @@ export { copy } from "./copy";
 export { command } from "./command";
 export { swap } from "./swap";
 export { templater } from "./templater";
-export { chain } from "./chain"; 
+export { chain } from "./chain";
+export { variable } from "./variable";
