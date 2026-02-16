@@ -12,7 +12,5 @@ export const variable = (app: App, args: Arguments, buttonStart: Position): void
     const variables = quickadd.settings.globalVariables;
     // Assign variable the value passed
     variables[name] = value;
-    console.log(variables);
-    console.log(name + " = " + value);
   }
 }; 
