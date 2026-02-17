@@ -29,12 +29,16 @@ export default class ButtonsPlugin extends Plugin {
   private storeEvents = new Events();
   private indexCount = 0;
   private storeEventsRef: EventRef;
+  private globalVariables: Record<string, string>;
+
 
   private async addButtonInEdit(_app: App) {
     // CM6 extension handles inline button rendering in edit mode
     // This method is kept for compatibility but CM6 handles it now
   }
   async onload(): Promise<void> {
+    this.globalVariables = {};
+    
     this.app.workspace.onLayoutReady(async () => {
       // await updateWarning();
     });
