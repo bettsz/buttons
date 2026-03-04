@@ -3,7 +3,7 @@ import { App } from "obsidian";
 import { Arguments, Position } from "../types";
 
 export const variable = (app: App, args: Arguments, buttonStart: Position): void => {
-  const name = args.name;
+  const var_name = args.var_name;
   const value = args.value;
 
   // Requires quickadd
@@ -11,6 +11,6 @@ export const variable = (app: App, args: Arguments, buttonStart: Position): void
   if (buttons) {
     const variables = buttons.globalVariables;
     // Assign variable the value passed
-    variables[name] = value;
+    variables[var_name] = value;
   }
 }; 
